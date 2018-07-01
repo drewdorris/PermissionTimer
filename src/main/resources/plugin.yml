@@ -1,0 +1,3 @@
+main: ${mainClass}
+name: ${name}
+version: ${version}
