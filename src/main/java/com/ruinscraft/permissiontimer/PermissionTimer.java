@@ -34,20 +34,17 @@ public class PermissionTimer extends JavaPlugin implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerJoin(PlayerJoinEvent event) {
+		if (getConfig() == null || getConfig().getConfigurationSection("timed") == null) {
+			return;
+		}
 		for (String path : getConfig().getConfigurationSection("timed").getKeys(false)) {
 			long time = System.currentTimeMillis();
-			Bukkit.getLogger().info(String.valueOf(time));
 			if (time >= getConfig().getLong("timed." + path + ".startTime", 0) &&
 					time <= getConfig().getLong("timed." + path + ".endTime", 0)) {
 				Player player = event.getPlayer();
 				User user = luckPermsApi.getUser(player.getName());
 				for (String permission : getConfig().getStringList("timed." + path + ".permissions")) {
 					Node node = luckPermsApi.buildNode(permission).setValue(true).build();
-					for (Node otherNode : user.getAllNodes()) {
-						if (otherNode.getPermission().toLowerCase().equals(permission.toLowerCase())) {
-							return;
-						}
-					}
 					if (user.setPermission(node).asBoolean()) {
 						luckPermsApi.getUserManager().saveUser(user);
 						String message = ChatColor.translateAlternateColorCodes("&".toCharArray()[0], 
